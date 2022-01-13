@@ -1,11 +1,11 @@
 // ignore_for_file: deprecated_member_use
-
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:login/home_page.dart';
-import 'package:login/model/user_data.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+import 'package:login/service/api_service.dart';
+import 'package:login/widgets/dialog_custom.dart';
+
+import 'widgets/dialog_custom.dart';
+import 'main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -15,9 +15,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passController = TextEditingController();
-  bool _isLoading = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -48,21 +47,21 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         child: TextField(
-                          controller: _emailController,
-                          decoration: InputDecoration(hintText: "Email"),
+                          controller: emailController,
+                          decoration: const InputDecoration(hintText: "Email"),
                         ),
                       ),
                       const SizedBox(
                         height: 10,
                       ),
                       Padding(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         child: TextField(
-                          controller: _passController,
+                          controller: passController,
                           obscureText: true,
-                          decoration: InputDecoration(hintText: "Password"),
+                          decoration: const InputDecoration(hintText: "Password"),
                         ),
                       )
                     ],
@@ -84,21 +83,28 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(fontSize: 32, color: Colors.white),
                   ),
                   onPressed: () {
-                    setState(() {
-                      _isLoading = true;
-                    });
-
-                    var signInHandle =
-                        signIn(_emailController.text, _passController.text);
-                    signInHandle.then((userData) {
-                      // print(object);
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()),
-                      );
-                    }).catchError((error) {});
+                      final checkUserIsNull = checkTextFiledUser(
+                      emailController.text, passController.text);
+                  checkUserIsNull.then((statusCheckFiled) {
+                    if (statusCheckFiled == true) {
+                      final dataUser = doLogin(
+                          emailController.text, passController.text);
+                      dataUser.then((user) {
+                        saveToLocalData(user.accessToken);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => HomePage(
+                              user: user
+                            ),
+                          ),
+                          (route) => false,
+                        );
+                      }).catchError((error) {
+                        showAlertDialog(context, "Login Fail", "");
+                      });
+                    }
+                  });
                   },
                 ),
               ),
@@ -117,17 +123,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-Future<UserData> signIn(String email, String pass) async {
-  var url = Uri.parse('https://selfu-api-demo.xeersoft.co.th/api/login/v2');
-  Map body = {"username": email, "password": pass};
-
-  var res = await http.post(url, body: body);
-
-  if (res.statusCode == 200) {
-    var userData = UserData.fromJson(jsonDecode(res.body));
-
-    return userData;
+Future<bool> checkTextFiledUser(username, password) async {
+  if (username != "" && password != "") {
+    return true;
   } else {
-    throw Exception("Error");
+    return false;
   }
 }
