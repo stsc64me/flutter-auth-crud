@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'login_page.dart';
-import 'main.dart';
 import 'model/user_data.dart';
 
 class HomePage extends StatelessWidget {
@@ -32,20 +31,18 @@ class HomePage extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (BuildContext context) => const LoginPage(),
-                    ),
-                    (route) => false,
-                  );
-                  clearLocalData();
+                      builder: (BuildContext context) => const LoginPage()
+                      ));
                 },
-                child: Text("logout")),
+                child: const Text("logout")),
           ],
         ),
         //
       ),
     );
   }
+
+  loginPage() {}
 }
