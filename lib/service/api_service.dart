@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:login/model/user_data.dart';
 
-import '../main.dart';
+import '../page/main.dart';
 
 
 Future<UserData> doLogin(username, password) async {

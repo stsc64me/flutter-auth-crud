@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:login/home_page.dart';
+import 'package:login/page/home.dart';
 import 'package:login/service/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'login_page.dart';
+import 'login.dart';
 
 void main() {
   runApp(const MaterialApp(

@@ -1,10 +1,9 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:login/home_page.dart';
+import 'package:login/page/home.dart';
 import 'package:login/service/api_service.dart';
 import 'package:login/widgets/dialog_custom.dart';
 
-import 'widgets/dialog_custom.dart';
 import 'main.dart';
 
 class LoginPage extends StatefulWidget {
